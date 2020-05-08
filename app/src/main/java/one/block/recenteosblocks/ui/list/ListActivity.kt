@@ -7,7 +7,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_list.*
+import kotlinx.android.synthetic.main.activity_list.progress_bar
+import kotlinx.android.synthetic.main.activity_list.recycler_view
 import one.block.recenteosblocks.R
 import one.block.recenteosblocks.data.db.entities.Block
 import one.block.recenteosblocks.data.db.entities.BlockchainInfo

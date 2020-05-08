@@ -1,7 +1,5 @@
 package one.block.recenteosblocks.data.network
 
-import android.util.Log
-import org.json.JSONException
 import retrofit2.Response
 import java.io.IOException
 
