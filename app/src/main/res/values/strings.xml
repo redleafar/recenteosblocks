@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">Recent Eos Blocks</string>
-    <string name="block_id">Block id:</string>
-    <string name="block_number_label">Block number:</string>
+    <string name="block_id">Block id: </string>
+    <string name="block_number">Block number: </string>
+    <string name="block_producer">Block producer: </string>
+    <string name="timestamp">Timestamp: </string>
+    <string name="confirmed">Confirmed: </string>
+    <string name="previous">Previous: </string>
+    <string name="transaction_mroot">Transaction mroot: </string>
+    <string name="action_mroot">Action mroot: </string>
+    <string name="schedule_version">Schedule version: </string>
+    <string name="ref_block_prefix">Ref. block prefix</string>
     <string name="go_to_list">Go to block list</string>
 </resources>

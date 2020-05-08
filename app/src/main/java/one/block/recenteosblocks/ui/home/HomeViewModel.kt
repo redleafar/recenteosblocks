@@ -13,7 +13,7 @@ class HomeViewModel : ViewModel() {
     val goToListEvent : LiveData<Event<Int>>
         get() = _goToListEvent
 
-    fun goToList(view: View) {
-        _goToListEvent.value = Event(view.id)
+    fun goToList(viewId: Int) {
+        _goToListEvent.value = Event(viewId)
     }
 }

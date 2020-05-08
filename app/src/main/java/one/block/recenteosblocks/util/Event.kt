@@ -5,7 +5,7 @@ open class Event<out T>(private val content: T) {
     var hasBeenHandled = false
         private set
 
-    fun getContentIfNotHandled(): T? {
+    fun hasBeenHandled(): T? {
         return if (hasBeenHandled) {
             null
         } else {
@@ -14,5 +14,5 @@ open class Event<out T>(private val content: T) {
         }
     }
 
-    fun peekContent(): T = content
+    fun getContent(): T = content
 }

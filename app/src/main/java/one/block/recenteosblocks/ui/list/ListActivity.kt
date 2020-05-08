@@ -1,11 +1,8 @@
 package one.block.recenteosblocks.ui.list
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -18,6 +15,7 @@ import one.block.recenteosblocks.data.network.EosAPI
 import one.block.recenteosblocks.data.repositories.BlockRepository
 import one.block.recenteosblocks.databinding.ActivityListBinding
 import one.block.recenteosblocks.ui.adapter.BlockAdapter
+import one.block.recenteosblocks.ui.detail.BlockDetailActivity
 import one.block.recenteosblocks.util.hide
 import one.block.recenteosblocks.util.show
 import one.block.recenteosblocks.util.toast
@@ -27,8 +25,11 @@ class ListActivity : AppCompatActivity() {
     private lateinit var factory: ListViewModelFactory
     private lateinit var viewModel: ListViewModel
     private lateinit var adapter: BlockAdapter
+    private val onItemClick: (block: Block) -> Unit = { block ->
+        viewModel.onItemClick(block)
+    }
 
-    private var list: ArrayList<Block> = ArrayList()
+    private var list: MutableList<Block> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +50,7 @@ class ListActivity : AppCompatActivity() {
     }
 
     fun initAdapter() {
-        adapter = BlockAdapter(list)
+        adapter = BlockAdapter(list, onItemClick)
         recycler_view.also {
             it.layoutManager = LinearLayoutManager(this)
             it.setHasFixedSize(true)
@@ -80,6 +81,11 @@ class ListActivity : AppCompatActivity() {
         viewModel.block.observe(this, Observer {
             list.add(it)
             recycler_view.adapter?.notifyDataSetChanged()
+        })
+
+        viewModel.onItemClickEvent.observe(this, Observer {
+            val intent = BlockDetailActivity.getIntent(this, it.getContent())
+            startActivity(intent)
         })
     }
 }

@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.goToListEvent.observe(this, Observer {
-            it.getContentIfNotHandled()?.let {
+            it.hasBeenHandled()?.let {
                 goToListActivity()
             }
         })

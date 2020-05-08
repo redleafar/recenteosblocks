@@ -7,12 +7,13 @@ import java.io.IOException
 
 abstract class SafeApiRequest {
 
-    suspend fun<T: Any> apiRequest(call: suspend() -> Response<T>) : T {
+    suspend fun<T: Any> apiRequest(call: suspend() -> Response<T>) : T? {
         val response = call.invoke()
         if (response.isSuccessful) {
-            return response.body()!!
+            return response.body()?.let {
+                response.body()
+            }
         } else {
-            Log.d("retro", response.errorBody()!!.string())
             throw ApiException(response.code().toString())
         }
     }

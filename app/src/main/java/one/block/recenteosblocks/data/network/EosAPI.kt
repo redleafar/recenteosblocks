@@ -6,7 +6,10 @@ import one.block.recenteosblocks.data.db.entities.BlockchainInfo
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 
 interface EosAPI {
 

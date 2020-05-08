@@ -11,6 +11,7 @@ import one.block.recenteosblocks.data.repositories.BlockRepository
 import one.block.recenteosblocks.util.Constants.BLOCK_NUM_OR_ID
 import one.block.recenteosblocks.util.Constants.NUMBER_OF_BLOCKS
 import one.block.recenteosblocks.util.Coroutines
+import one.block.recenteosblocks.util.Event
 
 class ListViewModel(
     private val blockRepository: BlockRepository
@@ -20,12 +21,16 @@ class ListViewModel(
     private lateinit var getBlockJob: Job
     private val _blockchainInfo = MutableLiveData<BlockchainInfo>()
     private val _block = MutableLiveData<Block>()
+    private val _onItemClickEvent = MutableLiveData<Event<Block>>()
 
     val blockchainInfo : LiveData<BlockchainInfo>
         get() = _blockchainInfo
 
     val block : LiveData<Block>
         get() = _block
+
+    val onItemClickEvent : LiveData<Event<Block>>
+        get() = _onItemClickEvent
 
     fun getBlockchainInfo() {
         getBlockchainInfoJob = Coroutines.ioThenMain(
@@ -40,11 +45,13 @@ class ListViewModel(
     }
 
     fun getBlocksList() {
-        val requestBody = getRequestBody(
-            BLOCK_NUM_OR_ID,
-            _blockchainInfo.value?.head_block_num!!
-        )
-        getLastNBlocks(NUMBER_OF_BLOCKS, requestBody)
+        _blockchainInfo.value?.headBlockNum?.let { headBlockNum ->
+            val requestBody = getRequestBody(
+                BLOCK_NUM_OR_ID,
+                headBlockNum
+            )
+            getLastNBlocks(NUMBER_OF_BLOCKS, requestBody)
+        }
     }
 
     fun getLastNBlocks(nBlocks: Int, requestBody: JsonObject) {
@@ -57,11 +64,13 @@ class ListViewModel(
                 {
                     it?.let {
                         _block.value = it
-                        newRequestBody = getRequestBody(
-                            BLOCK_NUM_OR_ID,
-                            _block.value?.previous!!
-                        )
-                        getLastNBlocks(nBlocks - 1, newRequestBody)
+                        _block.value?.previous?.let {
+                            newRequestBody = getRequestBody(
+                                BLOCK_NUM_OR_ID,
+                                _block.value?.previous!!
+                            )
+                            getLastNBlocks(nBlocks - 1, newRequestBody)
+                        }
                     }
                 }
             )
@@ -72,6 +81,10 @@ class ListViewModel(
         val requestBody = JsonObject()
         requestBody.addProperty(key, headBlockNum)
         return requestBody
+    }
+
+    fun onItemClick(block: Block) {
+        _onItemClickEvent.value = Event(block)
     }
 
     override fun onCleared() {

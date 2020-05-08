@@ -9,9 +9,9 @@ import one.block.recenteosblocks.data.db.entities.Block
 import one.block.recenteosblocks.databinding.RecyclerviewBlockBinding
 
 class BlockAdapter(
-    private val blocks: List<Block>
+    private val blocks: List<Block>,
+    private val onItemClick: ((block: Block) -> Unit)
 ) : RecyclerView.Adapter<BlockAdapter.BlockViewHolder>() {
-
     override fun getItemCount() = blocks.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
@@ -22,7 +22,11 @@ class BlockAdapter(
                 parent,
                 false
             )
-        )
+        ).apply {
+            itemView.setOnClickListener {
+                onItemClick.invoke(blocks[adapterPosition])
+            }
+        }
 
     override fun onBindViewHolder(holder: BlockViewHolder, position: Int) {
         holder.recyclerViewBlockBinding.block = blocks[position]
@@ -30,7 +34,9 @@ class BlockAdapter(
 
     inner class BlockViewHolder(
         val recyclerViewBlockBinding: RecyclerviewBlockBinding
-    ) : RecyclerView.ViewHolder(recyclerViewBlockBinding.root)
+    ) : RecyclerView.ViewHolder(recyclerViewBlockBinding.root) {
+
+    }
 
 
 }
