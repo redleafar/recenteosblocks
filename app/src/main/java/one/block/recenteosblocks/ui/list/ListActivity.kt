@@ -69,11 +69,6 @@ class ListActivity : AppCompatActivity() {
         viewModel.getBlockchainInfo()
     }
 
-    fun showInfo(blockchainInfo: BlockchainInfo) {
-        progress_bar.hide()
-        toast(blockchainInfo.toString())
-    }
-
     fun initObservers() {
         viewModel.blockchainInfo.observe(this, Observer {
             progress_bar.hide()
@@ -87,6 +82,10 @@ class ListActivity : AppCompatActivity() {
         viewModel.onItemClickEvent.observe(this, Observer {
             val intent = BlockDetailActivity.getIntent(this, it.getContent())
             startActivity(intent)
+        })
+
+        viewModel.showEventMessage.observe(this, Observer {
+            toast(it.getContent())
         })
     }
 }

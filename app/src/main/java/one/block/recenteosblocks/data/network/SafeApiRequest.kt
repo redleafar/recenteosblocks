@@ -1,7 +1,9 @@
 package one.block.recenteosblocks.data.network
 
+import one.block.recenteosblocks.util.ApiException
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Response
-import java.io.IOException
 
 abstract class SafeApiRequest {
 
@@ -12,9 +14,16 @@ abstract class SafeApiRequest {
                 response.body()
             }
         } else {
-            throw ApiException(response.code().toString())
+            val error = response.errorBody()?.toString()
+            val message = StringBuilder()
+
+            error?.let {
+                try {
+                    message.append(JSONObject(it).getString("message"))
+                } catch (e: JSONException) { }
+            }
+            message.append("Error code: ${response.code()}")
+            throw ApiException(message.toString())
         }
     }
 }
-
-class ApiException(message: String): IOException(message)

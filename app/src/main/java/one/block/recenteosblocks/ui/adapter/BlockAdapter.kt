@@ -9,7 +9,7 @@ import one.block.recenteosblocks.data.db.entities.Block
 import one.block.recenteosblocks.databinding.RecyclerviewBlockBinding
 
 class BlockAdapter(
-    private val blocks: List<Block>,
+    private val blocks: MutableList<Block>,
     private val onItemClick: ((block: Block) -> Unit)
 ) : RecyclerView.Adapter<BlockAdapter.BlockViewHolder>() {
     override fun getItemCount() = blocks.size
@@ -34,9 +34,5 @@ class BlockAdapter(
 
     inner class BlockViewHolder(
         val recyclerViewBlockBinding: RecyclerviewBlockBinding
-    ) : RecyclerView.ViewHolder(recyclerViewBlockBinding.root) {
-
-    }
-
-
+    ) : RecyclerView.ViewHolder(recyclerViewBlockBinding.root)
 }
