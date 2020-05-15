@@ -20,8 +20,13 @@ object Coroutines {
             }
         }
 
-    fun<T: Any> main(work: suspend (() -> T?)) =
+    fun<T: Any> ioCoroutine(work: suspend (() -> T?)) =
         CoroutineScope(Dispatchers.Main).launch {
+            work()
+        }
+
+    fun<T: Any> mainCoroutine(work: suspend (() -> T?)) =
+        CoroutineScope(Dispatchers.IO).launch {
             work()
         }
 }

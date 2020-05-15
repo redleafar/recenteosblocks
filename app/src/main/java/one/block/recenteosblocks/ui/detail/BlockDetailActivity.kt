@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_block_detail.block_action_mroot
 import kotlinx.android.synthetic.main.activity_block_detail.block_confirmed
 import kotlinx.android.synthetic.main.activity_block_detail.block_id
@@ -19,15 +18,13 @@ import kotlinx.android.synthetic.main.activity_block_detail.block_timestamp
 import kotlinx.android.synthetic.main.activity_block_detail.block_transaction_mroot
 import one.block.recenteosblocks.R
 import one.block.recenteosblocks.data.db.entities.Block
-import one.block.recenteosblocks.data.network.EosAPI
-import one.block.recenteosblocks.data.repositories.BlockRepository
 import one.block.recenteosblocks.databinding.ActivityBlockDetailBinding
 import one.block.recenteosblocks.util.Constants.BLOCK_KEY
+import org.koin.android.ext.android.inject
 
 class BlockDetailActivity : AppCompatActivity() {
 
-    private lateinit var factory: BlockDetailViewModelFactory
-    private lateinit var viewModel: BlockDetailViewModel
+    private val viewModel: BlockDetailViewModel by inject()
 
     companion object {
         fun getIntent(context: Context, block: Block): Intent {
@@ -37,17 +34,13 @@ class BlockDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initViewModel()
+        initBinding()
         initObservers()
         getBlockDetail()
     }
 
-    private fun initViewModel() {
+    private fun initBinding() {
         val binding: ActivityBlockDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_block_detail)
-        val eosAPI = EosAPI()
-        val blockRepository = BlockRepository(eosAPI)
-        factory = BlockDetailViewModelFactory(blockRepository)
-        viewModel = ViewModelProvider(this@BlockDetailActivity, factory).get(BlockDetailViewModel::class.java)
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
     }

@@ -8,11 +8,11 @@ import kotlinx.coroutines.Job
 import one.block.recenteosblocks.data.db.entities.Block
 import one.block.recenteosblocks.data.db.entities.BlockchainInfo
 import one.block.recenteosblocks.data.repositories.BlockRepository
-import one.block.recenteosblocks.util.ApiException
 import one.block.recenteosblocks.util.Constants.BLOCK_NUM_OR_ID
 import one.block.recenteosblocks.util.Constants.NUMBER_OF_BLOCKS
 import one.block.recenteosblocks.util.Coroutines
 import one.block.recenteosblocks.util.Event
+import one.block.recenteosblocks.util.getRequestBody
 
 class ListViewModel(
     private val blockRepository: BlockRepository
@@ -62,21 +62,18 @@ class ListViewModel(
         if (numBlocks > 0) {
             getBlockJob = Coroutines.ioThenMain(
                 { blockRepository.getBlock(requestBody) },
-                { addBlockAndGetPrevious(numBlocks - 1, it) },
+                { saveBlockAndGetPrevious(numBlocks - 1, it) },
                 { _showEventMessage.value = Event(it) }
             )
         }
     }
 
-    fun getRequestBody(key: String, headBlockNum: String) : JsonObject{
-        val requestBody = JsonObject()
-        requestBody.addProperty(key, headBlockNum)
-        return requestBody
-    }
-
-    fun addBlockAndGetPrevious(numBlocks: Int, block: Block?) {
+    fun saveBlockAndGetPrevious(numBlocks: Int, block: Block?) {
         block?.let {
-            _block.value = it as Block?
+            _block.value = it
+            Coroutines.ioCoroutine {
+                blockRepository.saveBlock(it)
+            }
             _block.value?.previous?.let {
                 val newRequestBody = getRequestBody(
                     BLOCK_NUM_OR_ID,

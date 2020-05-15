@@ -1,6 +1,5 @@
 package one.block.recenteosblocks.ui.home
 
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

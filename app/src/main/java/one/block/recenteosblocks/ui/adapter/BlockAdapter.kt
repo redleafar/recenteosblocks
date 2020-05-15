@@ -35,4 +35,8 @@ class BlockAdapter(
     inner class BlockViewHolder(
         val recyclerViewBlockBinding: RecyclerviewBlockBinding
     ) : RecyclerView.ViewHolder(recyclerViewBlockBinding.root)
+
+    fun updateList(block: Block) {
+
+    }
 }
