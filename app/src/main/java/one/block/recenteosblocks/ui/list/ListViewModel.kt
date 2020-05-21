@@ -3,8 +3,11 @@ package one.block.recenteosblocks.ui.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import one.block.recenteosblocks.data.db.entities.Block
 import one.block.recenteosblocks.data.db.entities.BlockchainInfo
 import one.block.recenteosblocks.data.repositories.BlockRepository
@@ -13,13 +16,12 @@ import one.block.recenteosblocks.util.Constants.NUMBER_OF_BLOCKS
 import one.block.recenteosblocks.util.Coroutines
 import one.block.recenteosblocks.util.Event
 import one.block.recenteosblocks.util.getRequestBody
+import java.io.IOException
 
 class ListViewModel(
     private val blockRepository: BlockRepository
 ) : ViewModel() {
 
-    private lateinit var getBlockchainInfoJob: Job
-    private lateinit var getBlockJob: Job
     private val _blockchainInfo = MutableLiveData<BlockchainInfo>()
     private val _block = MutableLiveData<Block>()
     private val _onItemClickEvent = MutableLiveData<Event<Block>>()
@@ -38,14 +40,17 @@ class ListViewModel(
         get() = _showEventMessage
 
     fun getBlockchainInfo() {
-        getBlockchainInfoJob = Coroutines.ioThenMain(
-            { blockRepository.getBlockchainInfo() },
-            {
-                _blockchainInfo.value = it
+        viewModelScope.launch {
+            try {
+                val blockChainInfo = viewModelScope.async {
+                    blockRepository.getBlockchainInfo()
+                }.await()
+                _blockchainInfo.value = blockChainInfo
                 getBlocksList()
-            },
-            { _showEventMessage.value = Event(it) }
-        )
+            } catch (networkException: IOException) {
+                _showEventMessage.value = Event(networkException.toString())
+            }
+        }
     }
 
     fun getBlocksList() {
@@ -60,18 +65,23 @@ class ListViewModel(
 
     fun getLastNBlocks(numBlocks: Int, requestBody: JsonObject) {
         if (numBlocks > 0) {
-            getBlockJob = Coroutines.ioThenMain(
-                { blockRepository.getBlock(requestBody) },
-                { saveBlockAndGetPrevious(numBlocks - 1, it) },
-                { _showEventMessage.value = Event(it) }
-            )
+            viewModelScope.launch {
+                try {
+                    val block = viewModelScope.async {
+                        blockRepository.getBlock(requestBody)
+                    }.await()
+                    saveBlockAndGetPrevious(numBlocks - 1, block)
+                } catch (networkException: IOException) {
+                    _showEventMessage.value = Event(networkException.toString())
+                }
+            }
         }
     }
 
     fun saveBlockAndGetPrevious(numBlocks: Int, block: Block?) {
         block?.let {
             _block.value = it
-            Coroutines.ioCoroutine {
+            viewModelScope.launch {
                 blockRepository.saveBlock(it)
             }
             _block.value?.previous?.let {
@@ -86,11 +96,5 @@ class ListViewModel(
 
     fun onItemClick(block: Block) {
         _onItemClickEvent.value = Event(block)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        if (::getBlockchainInfoJob.isInitialized) getBlockchainInfoJob.cancel()
-        if (::getBlockJob.isInitialized) getBlockJob.cancel()
     }
 }
