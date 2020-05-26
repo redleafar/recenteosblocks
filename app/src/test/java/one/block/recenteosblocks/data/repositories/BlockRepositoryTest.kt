@@ -1,6 +1,7 @@
 package one.block.recenteosblocks.data.repositories
 
 import com.google.gson.JsonObject
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runBlockingTest
 import one.block.recenteosblocks.data.db.AppDatabase
@@ -13,7 +14,6 @@ import one.block.recenteosblocks.util.getRequestBody
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import retrofit2.Response
 
@@ -46,11 +46,11 @@ class BlockRepositoryTest {
     private lateinit var requestBody: JsonObject
 
     @Before
-    fun setup() {
+    fun setUp() {
         MockitoAnnotations.initMocks(this)
         blockRepository = BlockRepository(eosApi, db)
         blockchainInfo = BlockchainInfo(HEAD_BLOCK_NUM)
-        requestBody = getRequestBody(BLOCK_NUM_OR_ID, BLOCK_ID)
+        requestBody = getRequestBody(BLOCK_NUM_OR_ID, BLOCK_NUM)
         block = Block(
             BLOCK_ID,
             BLOCK_NUM,
@@ -69,14 +69,14 @@ class BlockRepositoryTest {
     fun getBlockchainInfo() = runBlockingTest {
             whenever(eosApi.getBlockchainInfo()).thenReturn(Response.success(blockchainInfo))
             blockRepository.getBlockchainInfo()
-            Mockito.verify(eosApi).getBlockchainInfo()
+            verify(eosApi).getBlockchainInfo()
         }
 
     @Test
     fun getBlock() = runBlockingTest {
             whenever(eosApi.getBlock(requestBody)).thenReturn(Response.success(block))
             blockRepository.getBlock(requestBody)
-            Mockito.verify(eosApi).getBlock(requestBody)
+            verify(eosApi).getBlock(requestBody)
         }
 
     @Test
@@ -84,7 +84,7 @@ class BlockRepositoryTest {
             whenever(db.getBlockDao()).thenReturn(dao)
             whenever(dao.insertOrUpdate(block)).thenReturn(0)
             blockRepository.saveBlock(block)
-            Mockito.verify(db).getBlockDao()
-            Mockito.verify(dao).insertOrUpdate(block)
+            verify(db).getBlockDao()
+            verify(dao).insertOrUpdate(block)
         }
 }

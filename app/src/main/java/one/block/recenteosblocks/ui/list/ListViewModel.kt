@@ -53,7 +53,7 @@ class ListViewModel(
         }
     }
 
-    fun getBlocksList() {
+    private fun getBlocksList() {
         _blockchainInfo.value?.headBlockNum?.let { headBlockNum ->
             val requestBody = getRequestBody(
                 BLOCK_NUM_OR_ID,
@@ -63,7 +63,7 @@ class ListViewModel(
         }
     }
 
-    fun getLastNBlocks(numBlocks: Int, requestBody: JsonObject) {
+    private fun getLastNBlocks(numBlocks: Int, requestBody: JsonObject) {
         if (numBlocks > 0) {
             viewModelScope.launch {
                 try {
@@ -78,16 +78,16 @@ class ListViewModel(
         }
     }
 
-    fun saveBlockAndGetPrevious(numBlocks: Int, block: Block?) {
+    private fun saveBlockAndGetPrevious(numBlocks: Int, block: Block?) {
         block?.let {
             _block.value = it
             viewModelScope.launch {
                 blockRepository.saveBlock(it)
             }
-            _block.value?.previous?.let {
+            _block.value?.previous?.let { previousBlockId ->
                 val newRequestBody = getRequestBody(
                     BLOCK_NUM_OR_ID,
-                    _block.value?.previous!!
+                    previousBlockId
                 )
                 getLastNBlocks(numBlocks - 1, newRequestBody)
             }
